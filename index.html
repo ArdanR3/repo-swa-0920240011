@@ -5,8 +5,19 @@
  <title>Praktikum Azure Static Web Apps</title>
  <style>
  body { font-family: Arial; margin: 40px; background: #f4f6f8; }
- .container { background: white; padding: 24px; border-radius: 12px; }
+ .container { background: white; padding: 24px; border-radius: 12px; max-width: 600px; margin: auto; }
  h1 { color: #1f4e79; }
+ /* Mengatur tampilan foto K-Pop agar rapi */
+ .img-box {
+   text-align: center;
+   margin-top: 20px;
+ }
+ .responsive-img { 
+   max-width: 100%; 
+   height: auto; 
+   border-radius: 8px; 
+   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+ }
  </style>
 </head>
 <body>
@@ -15,7 +26,12 @@
  <p>Halaman ini berhasil di-deploy menggunakan Azure Static Web Apps.</p>
  <p>Layanan: Azure Static Web Apps</p>
  <p>Deployment: GitHub Repository</p>
-  <p>Matkul: Cloud Computing</p>
+ <p>Matkul: Cloud Computing</p>
+ 
+ <!-- TEMPAT MENAMBAHKAN GAMBAR -->
+ <div class="img-box">
+   <img src="foto-h2h.jpg" alt="Hearts2Hearts Update" class="responsive-img">
+ </div>
  </div>
 </body>
 </html>
