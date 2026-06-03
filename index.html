@@ -1,20 +1,95 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Praktikum Azure Static Web Apps</title>
-    <style>
-        body { font-family: Arial; margin: 40px; background: #f4f6f8; }
-        .container { background: white; padding: 24px; border-radius: 12px; }
-        h1 { color: #1f4e79; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimasi Anggaran</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>Praktikum Azure Static Web Apps</h1>
-        <p>Halaman ini berhasil di-deploy menggunakan Azure Static Web Apps.</p>
-        <p>Layanan: Azure Static Web Apps</p>
-        <p>Deployment: GitHub Repository</p>
+<body class="bg-gray-100 p-8 font-sans">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-2xl font-bold mb-2">Kalkulator Dana Kegiatan</h1>
+        <p class="text-gray-600 mb-6">Politeknik Astra - TRPL</p>
+
+        <!-- Input Peserta -->
+        <label class="block mb-2 font-semibold">Jumlah Peserta:</label>
+        <input type="number" id="jumlahPeserta" value="150" 
+               class="w-full border p-2 rounded mb-4">
+
+        <!-- Input Komponen Biaya -->
+        <h3 class="font-semibold mb-2">Komponen Biaya:</h3>
+        <div class="flex gap-2 mb-4 komponen-row">
+            <input type="text" id="namaItem" value="Konsumsi Acara" 
+                   class="flex-1 border p-2 rounded">
+            <input type="number" id="hargaItem" value="25000" 
+                   class="w-32 border p-2 rounded">
+            <select id="jenisItem" class="border p-2 rounded">
+                <option value="per_kepala">Per Kepala</option>
+                <option value="fiks">Biaya Tetap</option>
+            </select>
+        </div>
+
+        <!-- Tombol Hitung -->
+        <button onclick="hitung()" 
+                class="w-full bg-blue-600 text-white font-bold py-2 rounded">
+            Hitung Estimasi
+        </button>
+
+        <!-- Area Hasil -->
+        <div id="hasil" class="mt-6 hidden bg-blue-50 p-4 rounded border">
+            <p>Biaya Pokok: <b id="outPokok"></b></p>
+            <p>Dana Darurat (10%): <b id="outDarurat" class="text-yellow-600"></b></p>
+            <hr class="my-2 border-blue-200">
+            <p class="text-lg">Total Anggaran: <b id="outTotal" class="text-green-600"></b></p>
+        </div>
     </div>
+
+    <script>
+        async function hitung() {
+            // URL Azure Function asli milik Ardan
+            const API_URL = "https://api-anggaran-ardan-avh5b2h8" +
+                            "gmcmc7ft.southeastasia-01.azure" +
+                            "websites.net/api/HttpPraktikum";
+
+            const jml = document.getElementById('jumlahPeserta').value;
+            const nama = document.getElementById('namaItem').value;
+            const harga = document.getElementById('hargaItem').value;
+            const jenis = document.getElementById('jenisItem').value;
+            
+            const payload = {
+                jumlah_peserta: jml,
+                komponen_biaya: [{
+                    nama: nama,
+                    biaya_satuan: parseFloat(harga),
+                    jenis: jenis
+                }]
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const res = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('outPokok').innerText = 
+                        "Rp " + res.total_biaya_pokok.toLocaleString('id-ID');
+                    document.getElementById('outDarurat').innerText = 
+                        "Rp " + res.dana_darurat_10persen.toLocaleString('id-ID');
+                    document.getElementById('outTotal').innerText = 
+                        "Rp " + res.total_estimasi_anggaran.toLocaleString('id-ID');
+                    document.getElementById('hasil').classList.remove('hidden');
+                } else {
+                    alert("Gagal memproses data: " + res.error);
+                }
+            } catch (err) {
+                alert("Gagal terhubung ke Azure. Cek CORS / Internet.");
+                console.error(err);
+            }
+        }
+    </script>
 </body>
 </html>
